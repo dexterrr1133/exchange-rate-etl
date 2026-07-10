@@ -1,0 +1,134 @@
+{
+  "name": "Exchange Rate ETL - Daily Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "bf0bdea9-b14d-415e-8524-038e6124e069",
+      "name": "Daily Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.frankfurter.app/latest",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "USD"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2bc53ac8-563e-4af3-903f-9c9e93aedfcc",
+      "name": "Fetch Exchange Rates",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Frankfurter returns: { amount, base, date, rates: { EUR: 0.91, GBP: 0.78, ... } }\n// Flatten into one row per currency so it inserts cleanly into a relational table.\nconst data = $input.first().json;\nconst rows = [];\n\nfor (const [currency, rate] of Object.entries(data.rates)) {\n  rows.push({\n    date: data.date,\n    base_currency: data.base,\n    currency,\n    rate\n  });\n}\n\nreturn rows.map(r => ({ json: r }));"
+      },
+      "id": "45118b91-635d-4d9e-bb5d-379551f3d1d8",
+      "name": "Flatten Rates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "exchange_rates",
+        "dataToSend": "autoMapInputData"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        688,
+        0
+      ],
+      "id": "ff26b948-cdbb-4f95-ac88-05003d9c9203",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "BZmFBhWXZ0ArLcGo",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Daily Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Exchange Rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Exchange Rates": {
+      "main": [
+        [
+          {
+            "node": "Flatten Rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten Rates": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Manila",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "availableInMCP": false
+  },
+  "versionId": "ca3a75f9-2ae9-4f7b-bfa5-354c797c3d26",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0dc96500ac5ae1defb3a28e70c5abf13fb09693a504edf37910e04d561d0a52b"
+  },
+  "nodeGroups": [],
+  "id": "d4oIxVYLSYGMQoW3",
+  "tags": []
+}
