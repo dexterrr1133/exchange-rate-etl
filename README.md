@@ -19,7 +19,7 @@ Supabase (PostgreSQL) — create
 
 ## Why this design
 
-- **Idempotent loads**: uses `Prefer: resolution=merge-duplicates` with a unique constraint on `(date, base_currency, currency)`, so re-running the pipeline never creates duplicate rows — safe to retry on failure.
+- **Idempotent loads**: uses a unique constraint on `(date, base_currency, currency)`, so re-running the pipeline never creates duplicate rows — safe to retry on failure.
 - **No API key required**: Frankfurter is a free, keyless public API, so the pipeline runs with zero external account setup.
 - **Historical tracking**: every day's rates are preserved (not overwritten), enabling trend analysis over time.
 
