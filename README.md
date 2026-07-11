@@ -14,7 +14,7 @@ Frankfurter API (public, no auth) — fetch latest USD rates
 Transform — flatten nested JSON into one row per currency
         │
         ▼
-Supabase (PostgreSQL) — upsert, deduplicated by (date, base, currency)
+Supabase (PostgreSQL) — create
 ```
 
 ## Why this design
