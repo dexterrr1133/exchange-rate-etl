@@ -1,5 +1,7 @@
 # Daily Exchange Rate ETL Pipeline
-![n8n workflow](screenshots/n8n-workflow.png)
+<p align="center">
+  <img src="screenshots/n8n-workflow.png" alt="n8n workflow" width="800">
+</p>
 
 An automated ETL pipeline that fetches daily USD exchange rates, transforms them into a normalized relational format, and loads them into a Postgres database — with historical tracking, no manual intervention, and a live dashboard for monitoring trends and pipeline health.
 
