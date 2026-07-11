@@ -27,10 +27,10 @@ Looker Studio — dashboard (trends, snapshot table, pipeline health)
 
 ## Why this design
 
-- **Idempotent loads**: uses a unique constraint on `(date, base_currency, currency)`, so re-running the pipeline never creates duplicate rows — safe to retry on failure.
+- **Idempotent loads**: uses a unique constraint on `(date, base_currency, currency)`, so re-running the pipeline never creates duplicate rows.
 - **No API key required**: Frankfurter is a free, keyless public API, so the pipeline runs with zero external account setup.
 - **Historical tracking**: every day's rates are preserved (not overwritten), enabling trend analysis over time.
-- **View-backed "latest" queries**: a `latest_rates` view (using `DISTINCT ON`) keeps the dashboard's snapshot table and scorecards simple — no date-filtering logic duplicated across every chart.
+- **View-backed "latest" queries**: a `latest_rates` view (using `DISTINCT ON`) keeps the dashboard's snapshot table and scorecards simple.
 - **Scale-normalized comparisons**: currencies span multiple orders of magnitude (e.g., IDR ~18,000 vs. EUR ~0.9 per USD), so the trend chart plots percentage change from a baseline rather than raw rate, keeping all currencies visually comparable on one chart.
 
 ## Tech Stack
